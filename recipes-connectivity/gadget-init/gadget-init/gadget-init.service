@@ -1,0 +1,10 @@
+#[Unit]
+#Description=Start USB Ethernet gadget
+
+#[Service]
+#RemainAfterExit=yes
+#ExecStart=/usr/bin/gadget-init.sh
+#ExecStop=/sbin/rmmod g_ether
+
+#[Install]
+#WantedBy=network.target

@@ -1,0 +1,25 @@
+#! /bin/sh
+
+case "$1" in
+  start)
+    /usr/bin/gadget-init.sh
+    ifup usb0
+    ;;
+
+  stop)
+    ifdown usb0
+    ;;
+
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  *)
+    echo "Usage: /etc/init.d/gadget_init {start|stop|restart}"
+    exit 1
+    ;;
+esac
+
+exit 0
+
+
