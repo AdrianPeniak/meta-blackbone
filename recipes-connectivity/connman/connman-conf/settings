@@ -1,0 +1,15 @@
+[global]
+OfflineMode=false
+PersistentTetheringMode=true
+
+[WiFi]
+Enable=false
+Tethering=false
+
+[Wired]
+Enable=true
+Tethering=false
+
+[Gadget]
+Enable=true
+Tethering=true

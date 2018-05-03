@@ -1,0 +1,24 @@
+--- ./arch/arm/boot/dts/am335x-boneblack.dts
++++ ./arch/arm/boot/dts/am335x-boneblack.dts
+@@ -86,6 +86,21 @@
+ 			AM33XX_IOPAD(0x86c, PIN_OUTPUT_PULLDOWN | MUX_MODE7) /* gpmc_a11.GPIO1_27 */
+ 		>;
+ 	};
++    
++	pru0_pins: pru0_pins { 
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x0984, PIN_OUTPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE5)
++			AM33XX_IOPAD(0x0980, PIN_INPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE5)
++			AM33XX_IOPAD(0x09a4, PIN_OUTPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE5)
++			AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE5) 
++		>; 
++	};
++};
++
++&pruss {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pru0_pins>;
+ };
+ 
+ &lcdc {
