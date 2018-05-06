@@ -20,12 +20,12 @@ git clone -b morty https://github.com/AdrianPeniak/meta-blackbone.git
 source oe-init-build-env
 ```
 In to use this layer please comment-out default machine "MACHINE ??= "qemux86""
-in generated file ./build/conf/local.conf and add following lines at the end of the file:
+in generated file ./conf/local.conf and add following lines at the end of the file:
 ```
 MACHINE = "blackbone-board"
 DISTRO  = "blackbone-distro"
 ```
-Also plase remove "meta-yocto-bsp" layer from generated file ./build/conf/bblayers.conf
+Also plase remove "meta-yocto-bsp" layer from generated file ./conf/bblayers.conf
 and add following meta layers to the list:
 ```
 -  <some path>/poky-morty/meta-yocto-bsp \
@@ -42,14 +42,15 @@ bitbake blackbone-image-minimal
 ```
 
 # Create an SD-Card for BeagleBone Black
-Please use script in directory "scripts" or prepare your SD-Card by yourself according [this tutorial.](https://github.com/linneman/planck/wiki/How-to-create-a-Boot-SD-Card-for-the-BeagleBone-black)
-Then copy "MLO and u-boot" files to boot partition:
+Please use script "blackbone-tools.sh" in scripts directory.
+Or prepare your SD-Card by yourself according [this tutorial.](https://github.com/linneman/planck/wiki/How-to-create-a-Boot-SD-Card-for-the-BeagleBone-black)
+And then copy "MLO and u-boot" files to boot partition:
 ```
 sudo cp MLO u-boot.img /media/<username>/boot/
 ```
 and write root file system to SD-Card:
 ```
-sudo dd if=<image name>.ext4 of=/dev/<root fs>
+sudo dd if=<image name>.ext3 of=/dev/<root fs>
 ```
 
-meta-blackbone layer maintainer: Adrian Peniak -> adrian@peniak.com
+meta-blackbone layer maintainer: Adrian Peniak -> adrian(at)peniak(dot)com
