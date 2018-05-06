@@ -22,9 +22,19 @@ source oe-init-build-env
 In to use this layer please comment-out default machine "MACHINE ??= "qemux86""
 in generated file ./conf/local.conf and add following lines at the end of the file:
 ```
-MACHINE = "blackbone-board"
-DISTRO  = "blackbone-distro"
+-  MACHINE ??= "qemux86"
++  #MACHINE ??= "qemux86"
++  MACHINE = "blackbone-board"
++  DISTRO  = "blackbone-distro"
 ```
+
+Optionaly you can choose OPKG (instead of default RPM) packaging systems, 
+for avoid python 2.7 runtime dependencies, by replacing "package_rpm" by "package_ipk":
+```
+-  PACKAGE_CLASSES ?= "package_rpm"
++  PACKAGE_CLASSES ?= "package_ipk"
+```
+
 Also plase remove "meta-yocto-bsp" layer from generated file ./conf/bblayers.conf
 and add following meta layers to the list:
 ```
