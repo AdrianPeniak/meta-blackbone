@@ -3,7 +3,7 @@ Recipes for the Beaglebone Black supporting PRU (RPMsg)
 
 # Prepare build machine
 ```shell
-sudo apt install build-essential chrpath diffstat gawk libncurses5-dev texinfo git
+sudo apt install build-essential chrpath diffstat gawk libncurses5-dev texinfo git libc6-i386
 ```
 
 # Clone required repos
