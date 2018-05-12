@@ -51,9 +51,23 @@ and add following meta layers to the list:
 bitbake blackbone-image-minimal
 ```
 
-# Create an SD-Card for BeagleBone Black
-Please use script "blackbone-tools.sh" in scripts directory.
-Or prepare your SD-Card by yourself according [this tutorial.](https://github.com/linneman/planck/wiki/How-to-create-a-Boot-SD-Card-for-the-BeagleBone-black)
+# Flash an SD-Card/eMMC for BeagleBone Black
+Please use script [blackbone-tools.sh](https://github.com/AdrianPeniak/meta-blackbone/blob/master/scripts/blackbone-tools.sh) in scripts directory and follow script instructions.
+Run script as sudo:
+```
+sudo ./blackbone-tools.sh
+```
+For creation SD-Crard for flash eMMC, you have to chose option 2 in script wizard:
+```
+Do you want write image for: 
+1: SD-Card
+2: MMC
+2
+```
+then put your SD-Card to the SD-Card slot on your BeagleBone and holding the S2 switch down for 5 sec, then the BeagleBone will to try booting from the SD-Card first. The S2 switch is above the SD-Card holder
+The blackbone-tools script will be automatically launched for the eMMC flashing. When the BeagleBone LEDs stop flashing in cylon-mode, then the eMMC flashing is complete.
+
+Or you can prepare your SD-Card by yourself according [this tutorial.](https://github.com/linneman/planck/wiki/How-to-create-a-Boot-SD-Card-for-the-BeagleBone-black)
 And then copy "MLO and u-boot" files to boot partition:
 ```
 sudo cp MLO u-boot.img /media/<username>/boot/
