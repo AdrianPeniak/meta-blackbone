@@ -11,6 +11,8 @@ IMGDIR="$BASEDIR/build/tmp/deploy/images/blackbone-board"
 TMPDIR="$SCRIPTDIR/.tmp"
 BOOTDIR="$TMPDIR/boot"
 ROOTFSDIR="$TMPDIR/rootFs"
+CONFFILE="$SCRIPTDIR/blackbone-tools.conf"
+FAKEROOTFS="$SCRIPTDIR/fakeRootFS"
 
 MMCPATH="/dev/mmcblk1"
 
@@ -141,10 +143,30 @@ function checkIntegritySDCard() {
     done
 }
 
+function fRecursiveCopy() {
+    cd $FAKEROOTFS
+    for file in $(find $FAKEROOTFS -type f) ; do
+        fGetAndCheckFullPath file
+        if [ $VAR -eq 2 ] ; then
+            if [ ${file##*/} == "blackbone-tools.postinst" ] ; then
+                [ $VAR -eq 0 ] && continue
+            fi
+            des="${ROOTFSDIR}/var/boneblackTools/fakeRootFS/${file#$FAKEROOTFS}"            
+        elif [ $VAR -eq 0 ] ; then
+            [ ${file##*/} == "blackbone-tools.postinst" ] && continue
+            des="$ROOTFSDIR${file#$FAKEROOTFS}"
+        fi
+        fInfo "cp ${file#$FAKEROOTFS} $des"  
+        [ -d ${des%/*} ] || mkdir -p ${des%/*}            
+        yes | cp -rf "$file" "$des"
+    done
+    [ $VAR -eq 0 ] && source /var/boneblackTools/fakeRootFS/blackbone-tools.postinst
+}
+
 function fPrepareMMCinstall() {
     cd $ROOTFSDIR
     fInfo "Prepare MMC installation"
-    [ -d $ROOTFSDIR/var/bonablackTools ] || mkdir $ROOTFSDIR/var/bonablackTools
+    [ -d $ROOTFSDIR/var/boneblackTools ] || mkdir $ROOTFSDIR/var/boneblackTools
     cp $SCRIPTDIR/blackbone-tools.sh $ROOTFSDIR/etc/init.d/blackbone-tools
     chmod +x $ROOTFSDIR/etc/init.d/blackbone-tools
     
@@ -159,7 +181,7 @@ function fPrepareMMCinstall() {
     cd $ROOTFSDIR/etc/rc5.d/
     ln -sf ../init.d/blackbone-tools S02blackbone-tools
     
-    cd $ROOTFSDIR/var/bonablackTools
+    cd $ROOTFSDIR/var/boneblackTools
     cp $UBOOT .
     cp $MLO .
     cp $IMAGE .
@@ -167,6 +189,8 @@ function fPrepareMMCinstall() {
     echo "IMAGE=\"$IMAGE\"" > env.txt
     echo "UBOOT=\"$UBOOT\"" >> env.txt
     echo "MLO=\"$MLO\"" >> env.txt
+    
+    fRecursiveCopy
     
     sync
 }
@@ -190,6 +214,7 @@ function fWriteImage() {
     sync
 
     [ $VAR -eq 2 ] && fPrepareMMCinstall
+    [ $VAR -eq 0 ] && fRecursiveCopy
     
     fInfo "Umount partitions"
     umount -l $BOOTDIR
@@ -203,10 +228,11 @@ function fInstallOption() {
         [ $? -eq 0 ] || return
     fi
     while [ true ] ; do
-        echo "Do you want write image for: "
+        echo "Do you want write image for [$VAR]: "
         echo "1: SD-Card" 
-        echo "2: MMC"
-        read -n 1 VAR
+        echo "2: eMMC"
+        read -n 1 tmp
+        VAR=${tmp:-$VAR}
         [ "$VAR" == "1" ] || [ "$VAR" == "2" ] && break
     done
     echo
@@ -217,7 +243,19 @@ function fGetAndCheckFullPath() {
     [ -e "${!1}" ] || fFatal "Not found ${!1} !"
     eval ${1}="$(realpath ${!1})"
     [ -e "${!1}" ] || fFatal "Not found ${!1} !!!"
-    echo ${!1}
+    #echo ${!1}
+}
+
+function fReadConfig() {
+    if [ -e $CONFFILE ] ; then
+        tmp=$(cut -d "=" -f 2 <<< $(grep -E ^INSTALLIMAGE="(eMMC|SD-Card)" $CONFFILE))
+        [ "$tmp" == "eMMC" ] && VAR=2
+        [ "$tmp" == "SD-Card" ] && VAR=1
+        SYSTEMPARTITION=$(cut -d "=" -f 2 <<< $(grep -E ^SYSTEMPARTITION= $CONFFILE))
+        IMAGE=$(cut -d "=" -f 2 <<< $(grep -E ^IMAGE= $CONFFILE))
+        UBOOT=$(cut -d "=" -f 2 <<< $(grep -E ^UBOOT= $CONFFILE))
+        MLO=$(cut -d "=" -f 2 <<< $(grep -E ^MLO= $CONFFILE))
+    fi
 }
 
 ###
@@ -228,25 +266,32 @@ function fGetAndCheckFullPath() {
 fInit
 fInfo "Welcome in BlackBone tools (note: auto-completion works)"
 
+fReadConfig
+echo "Press enter to use default value from config file -> [DEFAULT VALUE]"
 fInstallOption
 if [ $VAR -ne 0 ] ; then
-    cd /dev/
-    read -e -p "Select SD-Card for example /dev/mmcblk0(sdX): " SYSTEMPARTITION
+    cd /dev/    
+    read -e -p "Select SD-Card for example /dev/mmcblk0(sdX) [$SYSTEMPARTITION]: " tmp
+    SYSTEMPARTITION=${tmp:-$SYSTEMPARTITION}
     if [ -d $IMGDIR ] ; then 
         cd $IMGDIR
     else
         cd $SCRIPTDIR
     fi
-    read -e -p "Select image archive for example blackbone-image-minimal.tar.xz: " IMAGE
-    read -e -p "Select u-boot image  for example u-boot.img: " UBOOT
-    read -e -p "Select Memory LOader for example MLO: " MLO
+    read -e -p "Select image archive for example blackbone-image-minimal.tar.xz: [$IMAGE] " tmp
+    IMAGE=${tmp:-$IMAGE}
+    read -e -p "Select u-boot image  for example u-boot.img: [$UBOOT] " tmp
+    UBOOT=${tmp:-$UBOOT}
+    read -e -p "Select Memory LOader for example MLO: [$MLO] " tmp
+    MLO=${tmp:-$MLO}
 else
-    [ -e "/var/bonablackTools/env.txt" ] || fFatal "Not found /var/bonablackTools/env.txt"
-    source /var/bonablackTools/env.txt
+    [ -e "/var/boneblackTools/env.txt" ] || fFatal "Not found /var/boneblackTools/env.txt"
+    source /var/boneblackTools/env.txt
     SYSTEMPARTITION="$MMCPATH"
-    IMAGE="/var/bonablackTools/${IMAGE##*/}"
-    UBOOT="/var/bonablackTools/${UBOOT##*/}"
-    MLO="/var/bonablackTools/${MLO##*/}"
+    IMAGE="/var/boneblackTools/${IMAGE##*/}"
+    UBOOT="/var/boneblackTools/${UBOOT##*/}"
+    MLO="/var/boneblackTools/${MLO##*/}"
+    FAKEROOTFS="/var/boneblackTools/fakeRootFS"
 fi
 
 fInfo "Check files:"
@@ -261,7 +306,7 @@ if [ "$VAR" == "1" ] || [ "$VAR" == "2" ] ; then
     fInfo "SD-Card finished"
 else
     fInfo "MMC finished"
-    halt
+    #halt
 fi
 
 exit 0

@@ -1,0 +1,8 @@
+# All commands shall be executed on mounted eMMC
+cd $ROOTFSDIR
+
+# Your coustom code ;-)
+echo "***********" >  test.txt
+echo "* EXAMPLE *" >> test.txt
+echo "***********" >> test.txt
+
