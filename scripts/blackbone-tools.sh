@@ -306,7 +306,7 @@ if [ "$VAR" == "1" ] || [ "$VAR" == "2" ] ; then
     fInfo "SD-Card finished"
 else
     fInfo "MMC finished"
-    #halt
+    halt
 fi
 
 exit 0
