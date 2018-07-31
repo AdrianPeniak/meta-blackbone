@@ -6,6 +6,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+SCRIPTNAME="blackbone-tools.sh"
 BASEDIR="${SCRIPTDIR%/*/*}"
 IMGDIR="$BASEDIR/build/tmp/deploy/images/blackbone-board"
 TMPDIR="$SCRIPTDIR/.tmp"
@@ -22,6 +23,7 @@ UBOOT=""
 MLO=""
 BOOTPART=""
 ROOTPART=""
+DATAPART=""
 VAR=0
 
 [ "$1" == "debug" ] && set -x
@@ -58,59 +60,69 @@ function fInit() {
     [ -f /etc/bash_completion ] && . /etc/bash_completion    
 }
 
-function fMakeSD() {
-    # $1 -> SYSTEMPARTITION
-    fInfo "Prepare SD-Card partitions for $1"
+function fMkFirstPart() {
+    if [ $2 -eq 0 ] ; then 
+        (
+        echo o       # Create a new empty DOS partition table
+        echo p       # verify the partition table
+        echo n       # Add a new partition
+        echo p       # Primary partition
+        echo 1       # Partition number
+        echo         # First sector (Accept default)
+        echo +72261K # Last sector
+        echo t       # Change the partition type
+        echo c       # Partition type W95 FAT32 (LBA)
+        echo a       # Set the partition bootable
+        echo p       # Print the partition table
+        echo w       # Write changes
+        ) | fdisk $1
+    else
+        (
+        echo o       # Create a new empty DOS partition table
+        echo p       # verify the partition table
+        echo n       # Add a new partition
+        echo p       # Primary partition
+        echo 1       # Partition number
+        echo         # First sector (Accept default)
+        echo +72261K # Last sector
+        echo t       # Change the partition type
+        echo c       # Partition type W95 FAT32 (LBA)
+        echo a       # Set the partition bootable
+        echo 1       # Number of bootable partition
+        echo p       # Print the partition table
+        echo w       # Write changes
+        ) | fdisk $1
+    fi
+}
+
+function fMkNextPart() {
+    [ $3 -eq 0 ] && end="" || end=$(echo "+$3M")
     (
-    # Boot
-    echo o       # Create a new empty DOS partition table
-    echo p       #verify the partition table
     echo n       # Add a new partition
     echo p       # Primary partition
-    echo 1       # Partition number
+    echo $2       # Partition number
     echo         # First sector (Accept default)
-    echo +72261K # Last sector
-    echo t       # Change the partition type
-    echo c       # Partition type W95 FAT32 (LBA)
-    echo a       # Set the partition bootable
-    #echo 1       # Number of bootable partition
-    # RootFS
-    echo n       # Add a new partition
-    echo p       # Primary partition
-    echo 2       # Partition number
-    echo         # First sector (Accept default)
-    echo         # Last sector (Accept default)
+    echo $end    # Last sector
     echo p       # Print the partition table
     echo w       # Write changes
     ) | fdisk $1
+}
+
+function fMakeSD() {
+    # $1 -> SYSTEMPARTITION
+    fInfo "Prepare SD-Card partitions for $1"
+    fMkFirstPart $1 0
+    fMkNextPart  $1 2 0
     sleep 1
 }
 
 function fMakeMMC() {
     # $1 -> SYSTEMPARTITION
     fInfo "Prepare eMMC partitions for $1"
-    (
-    # Boot
-    echo o       # Create a new empty DOS partition table
-    echo p       #verify the partition table
-    echo n       # Add a new partition
-    echo p       # Primary partition
-    echo 1       # Partition number
-    echo         # First sector (Accept default)
-    echo +72261K # Last sector
-    echo t       # Change the partition type
-    echo c       # Partition type W95 FAT32 (LBA)
-    echo a       # Set the partition bootable
-    echo 1       # Number of bootable partition
-    # RootFS
-    echo n       # Add a new partition
-    echo p       # Primary partition
-    echo 2       # Partition number
-    echo         # First sector (Accept default)
-    echo         # Last sector (Accept default)
-    echo p       # Print the partition table
-    echo w       # Write changes
-    ) | fdisk $1
+    rootSize=$(df | grep /dev/root | awk '{print $3}')
+    fMkFirstPart $1 1
+    fMkNextPart  $1 2 $(($rootSize/1024))
+    fMkNextPart  $1 3 0
     sleep 2
 }
 
@@ -124,11 +136,13 @@ function fMakeFS() {
     
     [[ -e $1"p1" ]] && BOOTPART=$1"p1" || BOOTPART=$1"1"
     [[ -e $1"p2" ]] && ROOTPART=$1"p2" || ROOTPART=$1"2"
+    [[ -e $1"p3" ]] && DATAPART=$1"p3" || DATAPART=$1"3"
     
     [[ -e $BOOTPART ]] && mkfs.vfat  -F 16 -n "boot" $BOOTPART || fFatal "Partition not found $BOOTPART"
     fInfo "Boot partition created"
     [[ -e $ROOTPART ]] && mke2fs -F -j -L "root" $ROOTPART || fFatal "Partition not found $ROOTPART"
     fInfo "Root partition created"
+    [[ -e $DATAPART ]] && mke2fs -F -j -L "data" $DATAPART && fInfo "Data partition created"
 }
 
 # TODO
@@ -167,7 +181,7 @@ function fPrepareMMCinstall() {
     cd $ROOTFSDIR
     fInfo "Prepare MMC installation"
     [ -d $ROOTFSDIR/var/boneblackTools ] || mkdir $ROOTFSDIR/var/boneblackTools
-    cp $SCRIPTDIR/blackbone-tools.sh $ROOTFSDIR/etc/init.d/blackbone-tools
+    cp $SCRIPTDIR/$SCRIPTNAME $ROOTFSDIR/etc/init.d/blackbone-tools
     chmod +x $ROOTFSDIR/etc/init.d/blackbone-tools
     
     cd $ROOTFSDIR/etc/rc1.d/ 
@@ -195,6 +209,15 @@ function fPrepareMMCinstall() {
     sync
 }
 
+function fTryAddDataDir() {
+    if [ $DATAPART != "" ] ; then
+        [ -d $ROOTFSDIR/data ] || mkdir $ROOTFSDIR/data
+        echo "# Mount data" >> $ROOTFSDIR/etc/fstab
+        echo " /dev/mmcblk0p3     /data          auto       defaults  0  0" >> $ROOTFSDIR/etc/fstab
+        sync
+    fi
+}
+
 function fWriteImage() {
     # $1 -> SYSTEMPARTITION
     # Prepare SD-Card partitions
@@ -215,6 +238,7 @@ function fWriteImage() {
 
     [ $VAR -eq 2 ] && fPrepareMMCinstall
     [ $VAR -eq 0 ] && fRecursiveCopy
+    fTryAddDataDir
     
     fInfo "Umount partitions"
     umount -l $BOOTDIR
@@ -263,13 +287,13 @@ function fReadConfig() {
 ###
 [ -d $IMGDIR ] || fWarn "Not found $IMGDIR, you have to use full path for files!"
 
-fInit
 fInfo "Welcome in BlackBone tools (note: auto-completion works)"
 
 fReadConfig
 echo "Press enter to use default value from config file -> [DEFAULT VALUE]"
 fInstallOption
 if [ $VAR -ne 0 ] ; then
+    fInit
     cd /dev/    
     read -e -p "Select SD-Card for example /dev/mmcblk0(sdX) [$SYSTEMPARTITION]: " tmp
     SYSTEMPARTITION=${tmp:-$SYSTEMPARTITION}
@@ -287,6 +311,8 @@ if [ $VAR -ne 0 ] ; then
 else
     [ -e "/var/boneblackTools/env.txt" ] || fFatal "Not found /var/boneblackTools/env.txt"
     source /var/boneblackTools/env.txt
+    mount -f -o remount,rw /dev/root
+    fInit
     SYSTEMPARTITION="$MMCPATH"
     IMAGE="/var/boneblackTools/${IMAGE##*/}"
     UBOOT="/var/boneblackTools/${UBOOT##*/}"
