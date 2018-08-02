@@ -6,7 +6,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SCRIPTNAME="blackbone-tools.sh"
+SCRIPTNAME="blackbone-tools-ro.sh"
 BASEDIR="${SCRIPTDIR%/*/*}"
 IMGDIR="$BASEDIR/build/tmp/deploy/images/blackbone-board"
 TMPDIR="$SCRIPTDIR/.tmp"
@@ -174,7 +174,7 @@ function fRecursiveCopy() {
         [ -d ${des%/*} ] || mkdir -p ${des%/*}            
         yes | cp -rf "$file" "$des"
     done
-    [ $VAR -eq 0 ] && source /var/boneblackTools/fakeRootFS/blackbone-tools.postinst
+    [ $VAR -eq 0 ] && chmod +x $FAKEROOTFS/blackbone-tools.postinst && $FAKEROOTFS/blackbone-tools.postinst $ROOTFSDIR
 }
 
 function fPrepareMMCinstall() {

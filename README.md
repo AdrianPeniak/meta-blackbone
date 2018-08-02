@@ -53,6 +53,7 @@ bitbake blackbone-image-minimal
 
 # Flash an SD-Card/eMMC for BeagleBone Black
 Please use script [blackbone-tools.sh](https://github.com/AdrianPeniak/meta-blackbone/blob/master/scripts/blackbone-tools.sh) in scripts directory and follow script instructions.
+You can customize blackbone-tools.conf in order to set options & paths for required files as you want.
 Run script as sudo:
 ```
 sudo ./blackbone-tools.sh
@@ -76,5 +77,15 @@ and write root file system to SD-Card:
 ```
 sudo dd if=<image name>.ext3 of=/dev/<root fs>
 ```
+
+# Use ReadOnly file system
+In case of build blackbone-image-rofs image please use:
+```
+sudo ./blackbone-tools-ro.sh
+```
+instad of blackbone-tools.sh
+
+# Image customization 
+Way how to customize your image is pretty simple via "fakeRootFS" utility. In script directory you can find fakeRootFS folder which content will be copied as last (one by one) to SD-Card/eMMC. As you can see interface config is currently stored in fakeRootFS folder as example. There is also "blackbone-tools.postinst" which is script which will be executed during flash process. As example in this script are written cmd's for generating rsa key pair.
 
 meta-blackbone layer maintainer: Adrian Peniak -> adrian(at)peniak(dot)com
