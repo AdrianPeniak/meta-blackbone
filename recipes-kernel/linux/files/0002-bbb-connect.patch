@@ -1,0 +1,273 @@
+--- ./arch/arm/boot/dts/am335x-boneblack.dts
++++ ./arch/arm/boot/dts/am335x-boneblack.dts
+@@ -46,140 +46,168 @@
+ };
+ 
+ &am33xx_pinmux {
+-	nxp_hdmi_bonelt_pins: nxp_hdmi_bonelt_pins {
++	uart4_pins: uart4_pins {
+ 		pinctrl-single,pins = <
+-			0x1b0 0x03      /* xdma_event_intr0, OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT */
+-			0xa0 0x08       /* lcd_data0.lcd_data0, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xa4 0x08       /* lcd_data1.lcd_data1, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xa8 0x08       /* lcd_data2.lcd_data2, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xac 0x08       /* lcd_data3.lcd_data3, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xb0 0x08       /* lcd_data4.lcd_data4, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xb4 0x08       /* lcd_data5.lcd_data5, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xb8 0x08       /* lcd_data6.lcd_data6, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xbc 0x08       /* lcd_data7.lcd_data7, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xc0 0x08       /* lcd_data8.lcd_data8, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xc4 0x08       /* lcd_data9.lcd_data9, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xc8 0x08       /* lcd_data10.lcd_data10, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xcc 0x08       /* lcd_data11.lcd_data11, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xd0 0x08       /* lcd_data12.lcd_data12, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xd4 0x08       /* lcd_data13.lcd_data13, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xd8 0x08       /* lcd_data14.lcd_data14, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xdc 0x08       /* lcd_data15.lcd_data15, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT | AM33XX_PULL_DISA */
+-			0xe0 0x00       /* lcd_vsync.lcd_vsync, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT */
+-			0xe4 0x00       /* lcd_hsync.lcd_hsync, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT */
+-			0xe8 0x00       /* lcd_pclk.lcd_pclk, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT */
+-			0xec 0x00       /* lcd_ac_bias_en.lcd_ac_bias_en, OMAP_MUX_MODE0 | AM33XX_PIN_OUTPUT */
++			AM33XX_IOPAD(0x0874, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE6) /* P9_13 gpmc_wpn.uart4_txd_mux2 */
++			AM33XX_IOPAD(0x0870, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE6) /* P9_11 gpmc_wait0.uart4_rxd_mux2 */
+ 		>;
+ 	};
+-	nxp_hdmi_bonelt_off_pins: nxp_hdmi_bonelt_off_pins {
++
++	uart5_pins: uart5_pins {
+ 		pinctrl-single,pins = <
+-			0x1b0 0x03      /* xdma_event_intr0, OMAP_MUX_MODE3 | AM33XX_PIN_OUTPUT */
++			AM33XX_IOPAD(0x08c0, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE4) /* P8_37 lcd_data8.uart5_txd */
++			AM33XX_IOPAD(0x08c4, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE4) /* P8_38 lcd_data9.uart5_rxd */
+ 		>;
+ 	};
+ 
+-	mcasp0_pins: mcasp0_pins {
++	spi0_pins: spi0_pins {
+ 		pinctrl-single,pins = <
+-			AM33XX_IOPAD(0x9ac, PIN_INPUT_PULLUP | MUX_MODE0) /* mcasp0_ahcklx.mcasp0_ahclkx */
+-			AM33XX_IOPAD(0x99c, PIN_OUTPUT_PULLDOWN | MUX_MODE2) /* mcasp0_ahclkr.mcasp0_axr2*/
+-			AM33XX_IOPAD(0x994, PIN_OUTPUT_PULLUP | MUX_MODE0) /* mcasp0_fsx.mcasp0_fsx */
+-			AM33XX_IOPAD(0x990, PIN_OUTPUT_PULLDOWN | MUX_MODE0) /* mcasp0_aclkx.mcasp0_aclkx */
+-			AM33XX_IOPAD(0x86c, PIN_OUTPUT_PULLDOWN | MUX_MODE7) /* gpmc_a11.GPIO1_27 */
++			AM33XX_IOPAD(0x095c, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE0) /* P9_17 spi0_cs0 */
++			AM33XX_IOPAD(0x0958, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE0) /* P9_18 spi0_d1 */
++			AM33XX_IOPAD(0x0954, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE0) /* P9_21 spi0_d0 */
++			AM33XX_IOPAD(0x0950, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE0) /* P9_22 spi0_sclk */
+ 		>;
+ 	};
++
++	eqep1_pins: eqep1_pins {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x08d0, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE2) /* P8_35: GPIO0_8 = EQEP1A_in */
++			AM33XX_IOPAD(0x08d4, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE2) /* P8_33: GPIO0_9 = EQEP1B_in */
++			AM33XX_IOPAD(0x08d8, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE2) /* P8_31: GPIO0_10 = EQEP1_index */
++			AM33XX_IOPAD(0x08dc, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE2) /* P8_32: GPIO0_11 = EQEP1_strobe */
++		>;
++	};
++
++	eqep2_pins: eqep2_pins {
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x08b0, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE3) /* P8_41: GPIO2_10 = EQEP2A_in 3V3 or less */
++			AM33XX_IOPAD(0x08b4, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE3) /* P8_42: GPIO2_11 = EQEP2B_in 3V3 or less */
++			AM33XX_IOPAD(0x08b8, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE3) /* P8_39: GPIO2_12 = EQEP2_index 3V3 or less */
++			AM33XX_IOPAD(0x08bc, PIN_OUTPUT_PULLUP | INPUT_EN | MUX_MODE3) /* P8_40: GPIO2_13 = EQEP2_strobe 3V3 or less */
++		>;
++	};
++    
++	pru0_pins: pru0_pins { 
++		pinctrl-single,pins = <
++			AM33XX_IOPAD(0x0984, PIN_OUTPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE5) /* P9_24 uart1_txd.pr1_uart0_txd 3V3 or less */
++			AM33XX_IOPAD(0x0980, PIN_INPUT_PULLUP  | SLEWCTRL_FAST | MUX_MODE5) /* P9_26 uart1_rxd.pr1_uart0_rxd 3V3 or less */
++			AM33XX_IOPAD(0x09a4, PIN_OUTPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE5) /* P9_27 mcasp0_fsr.pr1_pru0_pru_r30_5 3V3 or less */
++			AM33XX_IOPAD(0x0998, PIN_OUTPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE5) /* P9_30 mcasp0_axr0.pr1_pru0_pru_r30_2 3V3 or less */
++		>; 
++	};
++};
++&uart4 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart4_pins>;
+ };
+ 
+-&lcdc {
++&uart5 {
+ 	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart5_pins>;
++};
+ 
+-	/* If you want to get 24 bit RGB and 16 BGR mode instead of
+-	 * current 16 bit RGB and 24 BGR modes, set the propety
+-	 * below to "crossed" and uncomment the video-ports -property
+-	 * in tda19988 node.
+-	 */
+-	blue-and-red-wiring = "straight";
++&spi0 {
++	#address-cells = <1>;
++	#size-cells = <0>;
+ 
+-	port {
+-		lcdc_0: endpoint@0 {
+-			remote-endpoint = <&hdmi_0>;
+-		};
+-	};
+-};
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi0_pins>;
++	ti,pio-mode; /* disable dma when used as an overlay, dma gets stuck at 160 bits... */
++
++	channel@0 {
++		#address-cells = <1>;
++		#size-cells = <0>;
+ 
+-&i2c0 {
+-	tda19988: tda19988 {
+-		compatible = "nxp,tda998x";
+-		reg = <0x70>;
++		compatible = "spidev";
+ 
+-		pinctrl-names = "default", "off";
+-		pinctrl-0 = <&nxp_hdmi_bonelt_pins>;
+-		pinctrl-1 = <&nxp_hdmi_bonelt_off_pins>;
++		reg = <0>;
++		spi-max-frequency = <16000000>;
++		spi-cpha;
++	};
+ 
+-		/* Convert 24bit BGR to RGB, e.g. cross red and blue wiring */
+-		/* video-ports = <0x234501>; */
++	channel@1 {
++		#address-cells = <1>;
++		#size-cells = <0>;
+ 
+-		#sound-dai-cells = <0>;
+-		audio-ports = <	AFMT_I2S	0x03>;
++		compatible = "spidev";
+ 
+-		ports {
+-			port@0 {
+-				hdmi_0: endpoint@0 {
+-					remote-endpoint = <&lcdc_0>;
+-				};
+-			};
+-		};
++		reg = <1>;
++		spi-max-frequency = <16000000>;
+ 	};
+ };
+ 
+-&rtc {
+-	system-power-controller;
++&epwmss1 {
++	status = "okay";
+ };
+ 
+-&mcasp0	{
+-	#sound-dai-cells = <0>;
++&eqep1 {
++	status = "okay";
++
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&mcasp0_pins>;
++	pinctrl-0 = <&eqep1_pins>;
++
++	count_mode = <1>;	// count_mode is not userspace op_mode
++	// 0 -> Quadrature mode, normal 90 phase offset cha & chb.
++	// 1 -> Direction mode.  cha input = clock, chb input = direction
++	// 2 -> UP count mode for frequency measurement QDIR=1, ignore direction input
++	// 3 -> DOWN count mode for frequency measurement QDIR=0, ignore direction input
++
++	swap_inputs = <0>;	// swap channel A and B (0 - no, 1 - yes)
++	invert_qa = <0>;	// invert channel A input?
++	invert_qb = <0>;	// invert channel B input?
++	invert_qi = <0>;	// invert index input?
++	invert_qs = <0>;	// invert strobe input?
++	omit_interrupt = <0>;	// 1 -> do not install interrupt handler, 0 -> do install
++};
++
++&epwmss2 {
+ 	status = "okay";
+-	op-mode = <0>;	/* MCASP_IIS_MODE */
+-	tdm-slots = <2>;
+-	serial-dir = <	/* 0: INACTIVE, 1: TX, 2: RX */
+-			0 0 1 0
+-		>;
+-	tx-num-evt = <32>;
+-	rx-num-evt = <32>;
+ };
+ 
+-&sgx {
++&eqep2 {
+ 	status = "okay";
++
++	pinctrl-names = "default";
++	pinctrl-0 = <&eqep2_pins>;
++
++	count_mode = <1>;	// count_mode is not userspace op_mode
++	// 0 -> Quadrature mode, normal 90 phase offset cha & chb.
++	// 1 -> Direction mode.  cha input = clock, chb input = direction
++	// 2 -> UP count mode for frequency measurement QDIR=1, ignore direction input
++	// 3 -> DOWN count mode for frequency measurement QDIR=0, ignore direction input
++
++	swap_inputs = <0>;	// swap channel A and B? (0 - no, 1 - yes)
++	invert_qa = <0>;	// invert channel A input?
++	invert_qb = <0>;	// invert channel B input?
++	invert_qi = <0>;	// invert index input?
++	invert_qs = <0>;	// invert strobe input?
++	omit_interrupt = <0>;	// 1 -> do not install interrupt handler, 0 -> do install
+ };
+ 
+-/ {
+-	clk_mcasp0_fixed: clk_mcasp0_fixed {
+-		#clock-cells = <0>;
+-		compatible = "fixed-clock";
+-		clock-frequency = <24576000>;
+-	};
++&pruss {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&pru0_pins>;
++};
+ 
+-	clk_mcasp0: clk_mcasp0 {
+-		#clock-cells = <0>;
+-		compatible = "gpio-gate-clock";
+-		clocks = <&clk_mcasp0_fixed>;
+-		enable-gpios = <&gpio1 27 0>; /* BeagleBone Black Clk enable on GPIO1_27 */
+-	};
++&rtc {
++	system-power-controller;
++};
+ 
+-	sound {
+-		compatible = "simple-audio-card";
+-		simple-audio-card,name = "TI BeagleBone Black";
+-		simple-audio-card,format = "i2s";
+-		simple-audio-card,bitclock-master = <&dailink0_master>;
+-		simple-audio-card,frame-master = <&dailink0_master>;
+-
+-		dailink0_master: simple-audio-card,cpu {
+-			sound-dai = <&mcasp0>;
+-			clocks = <&clk_mcasp0>;
+-		};
+-
+-		simple-audio-card,codec {
+-			sound-dai = <&tda19988>;
+-		};
++&sgx {
++	status = "okay";
++};
++
++&tscadc {
++	status = "okay";
++	adc {
++		ti,adc-channels = <0 1 2 3 4 5 6 7>;
++		ti,chan-step-avg = <16 16 16 16 16 16 16 16>;
++		ti,chan-step-opendelay = <0x98 0x98 0x98 0x98 0x98 0x98 0x98 0x98>;
++		ti,chan-step-sampledelay = <0x0 0x0 0x0 0x0 0x0 0x0 0x0 0x0>;
+ 	};
+ };
++
+

@@ -1,0 +1,20 @@
+--- a/include/configs/ti_armv7_common.h
++++ b/include/configs/ti_armv7_common.h
+@@ -60,7 +60,16 @@
+ #define DEFAULT_MMC_TI_ARGS \
+ 	"mmcdev=0\0" \
+ 	"mmcrootfstype=ext4 rootwait\0" \
+-	"finduuid=part uuid mmc 0:2 uuid\0" \
++	"findsduuid=part uuid mmc 0:2 sduuid\0" \
++	"findemmcuuid=part uuid mmc 1:2 emmcuuid\0" \
++	"finduuid=if run findsduuid; then "\
++		"echo \"Boot from microSD\"; "\
++		"setenv uuid ${sduuid}; " \
++	"else " \
++		"run findemmcuuid; " \
++		"echo \"Boot from eMMC\"; " \
++		"setenv uuid ${emmcuuid}; " \
++	"fi;\0" \
+ 	"args_mmc=run finduuid;setenv bootargs console=${console} " \
+ 		"${optargs} " \
+ 		"root=PARTUUID=${uuid} rw " \
